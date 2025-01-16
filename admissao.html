@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Funcionários</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: url('Log SJ png.png'); /* Substitua pelo URL da sua imagem */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .formulario-container {
+            width: 80%;
+            max-width: 600px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .formulario-container input, .formulario-container button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #333;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .formulario-container button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        .formulario-container button:hover {
+            background-color: #45a049;
+        }
+
+        .table-container {
+            width: 80%;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow-x: auto;
+            animation: fadeIn 1s ease-out;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #444;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        td {
+            background-color: #222;
+            color: #ddd;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .status-presente {
+            color: #4CAF50;
+        }
+
+        .status-ausente {
+            color: #FF5722;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .btn-entrada {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-entrada:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        .btn-saida {
+            background-color: #FF5722;
+            color: white;
+        }
+
+        .btn-saida:hover {
+            background-color: #e64a19;
+            transform: scale(1.05);
+        }
+
+        .empty-state {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #bbb;
+            text-align: center;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .link-formulario {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .link-formulario a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .link-formulario a:hover {
+            color: #45a049;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Controle de Funcionários</h1>
+
+    <!-- Formulário de Dados Pessoais -->
+    <div class="formulario-container" id="formularioContainer">
+        <h2>Preencha os dados pessoais do funcionário</h2>
+        <input type="text" id="nomeFuncionario" placeholder="Nome Completo" />
+        <input type="text" id="cpf" placeholder="CPF" />
+        <input type="text" id="tituloEleitor" placeholder="Título de Eleitor" />
+        <input type="file" id="foto" accept="image/*" />
+        <input type="text" id="funcao" placeholder="Função" />
+        <button id="salvarDados">Salvar Dados</button>
+    </div>
+
+    <div class="table-container">
+        <table id="employeeTable" class="fade-in">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Status</th>
+                    <th>Horário de Entrada</th>
+                    <th>Horário de Saída</th>
+                    <th>Ações</th>
+                    <th>Dados Pessoais</th>
+                </tr>
+            </thead>
+            <tbody id="employeeTableBody">
+                <tr class="empty-state">
+                    <td colspan="7">Nenhum funcionário registrado</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let funcionarios = [];
+        let nextId = 1001;
+
+        // Função para gerar um número aleatório de 6 dígitos para o voucher
+        function gerarVoucher() {
+            return Math.floor(Math.random() * 900000) + 100000;
+        }
+
+        // Função para gerar um número aleatório de 5 dígitos para o cartão alimentação
+        function gerarCartaoAlimentacao() {
+            return Math.floor(Math.random() * 90000) + 10000;
+        }
+
+        // Função para adicionar um novo funcionário
+        function adicionarFuncionario(nome, cpf, tituloEleitor, foto, funcao) {
+            const idFuncionario = nextId++;
+            const voucherInternet = gerarVoucher();
+            const cartaoAlimentacao = gerarCartaoAlimentacao();
+
+            const novoFuncionario = {
+                id: idFuncionario,
+                nome: nome,
+                cpf: cpf,
+                tituloEleitor: tituloEleitor,
+                foto: foto,
+                funcao: funcao,
+                status: 'Ausente',
+                horarioEntrada: null,
+                horarioSaida: null,
+                voucherInternet: voucherInternet,
+                cartaoAlimentacao: cartaoAlimentacao
+            };
+
+            funcionarios.push(novoFuncionario);
+            renderizarTabela();
+            limparFormulario();
+        }
+
+        // Função para renderizar a tabela de funcionários
+        function renderizarTabela() {
+            const tabelaBody = document.getElementById('employeeTableBody');
+            tabelaBody.innerHTML = '';
+
+            if (funcionarios.length === 0) {
+                tabelaBody.innerHTML = '<tr class="empty-state"><td colspan="7">Nenhum funcionário registrado</td></tr>';
+                return;
+            }
+
+            funcionarios.forEach(funcionario => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${funcionario.id}</td>
+                    <td>${funcionario.nome}</td>
+                    <td>
+                        <span class="status ${funcionario.status === 'Presente' ? 'status-presente' : 'status-ausente'}">
+                            ${funcionario.status}
+                        </span>
+                    </td>
+                    <td>${funcionario.horarioEntrada ? funcionario.horarioEntrada : 'Não registrado'}</td>
+                    <td>${funcionario.horarioSaida ? funcionario.horarioSaida : 'Não registrado'}</td>
+                    <td>
+                        <button class="btn btn-entrada" onclick="registrarEntrada(${funcionario.id})">Entrada</button>
+                        <button class="btn btn-saida" onclick="registrarSaida(${funcionario.id})">Saída</button>
+                    </td>
+                    <td>
+                        <div>CPF: ${funcionario.cpf}</div>
+                        <div>Título de Eleitor: ${funcionario.tituloEleitor}</div>
+                        <div>Função: ${funcionario.funcao}</div>
+                        <div>Voucher: ${funcionario.voucherInternet}</div>
+                        <div>Cartão Alimentação: ${funcionario.cartaoAlimentacao}</div>
+                    </td>
+                `;
+                tabelaBody.appendChild(row);
+            });
+        }
+
+        // Função para registrar a entrada de um funcionário
+        function registrarEntrada(id) {
+            const funcionario = funcionarios.find(f => f.id === id);
+            if (funcionario && funcionario.status === 'Ausente') {
+                funcionario.status = 'Presente';
+                funcionario.horarioEntrada = new Date().toLocaleString();
+                renderizarTabela();
+                alert(`${funcionario.nome} entrou na empresa às ${funcionario.horarioEntrada}.`);
+            }
+        }
+
+        // Função para registrar a saída de um funcionário
+        function registrarSaida(id) {
+            const funcionario = funcionarios.find(f => f.id === id);
+            if (funcionario && funcionario.status === 'Presente') {
+                funcionario.status = 'Ausente';
+                funcionario.horarioSaida = new Date().toLocaleString();
+                renderizarTabela();
+                alert(`${funcionario.nome} saiu da empresa às ${funcionario.horarioSaida}.`);
+            }
+        }
+
+        // Função para limpar o formulário
+        function limparFormulario() {
+            document.getElementById('nomeFuncionario').value = '';
+            document.getElementById('cpf').value = '';
+            document.getElementById('tituloEleitor').value = '';
+            document.getElementById('foto').value = '';
+            document.getElementById('funcao').value = '';
+        }
+
+        // Evento de clique no botão "Salvar Dados"
+        document.getElementById('salvarDados').addEventListener('click', function() {
+            const nome = document.getElementById('nomeFuncionario').value;
+            const cpf = document.getElementById('cpf').value;
+            const tituloEleitor = document.getElementById('tituloEleitor').value;
+            const foto = document.getElementById('foto').files[0];
+            const funcao = document.getElementById('funcao').value;
+
+            if (nome && cpf && tituloEleitor && funcao) {
+                adicionarFuncionario(nome, cpf, tituloEleitor, foto, funcao);
+            } else {
+                alert("Por favor, preencha todos os campos.");
+            }
+        });
+
+        renderizarTabela();
+    </script>
+
+</body>
+</html>
