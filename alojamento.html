@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Ocupação de Quartos</title>
+  <style>
+    /* Estilo geral */
+    body, html {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+      overflow-x: hidden;
+      width: 100%;
+      height: 100%;
+    }
+
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      position: relative;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    header img {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 40px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      box-sizing: border-box;
+      height: calc(100vh - 120px); /* Altura ajustada considerando o header e o footer */
+      overflow-y: auto; /* Adiciona rolagem vertical caso necessário */
+      width: 100%;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 20px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+      font-size: 0.9em;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .status {
+      font-weight: bold;
+    }
+
+    .esgotado {
+      color: red;
+      font-size: 0.9em;
+    }
+
+    .disponivel {
+      color: green;
+      font-size: 0.9em;
+    }
+
+    h2 {
+      color: #4CAF50;
+      margin: 20px 0 10px;
+      font-size: 1.2em;
+    }
+
+    .button-container {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background-color 0.3s ease;
+      width: 90%;
+      max-width: 300px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    footer {
+      width: 100%;
+      text-align: center;
+      font-size: 0.8em;
+      color: #666;
+      padding: 10px;
+      background-color: #fff;
+      box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    /* Estilos para dispositivos móveis */
+    @media screen and (max-width: 768px) {
+      header h1 {
+        font-size: 1.2em;
+      }
+
+      header img {
+        height: 30px;
+      }
+
+      table {
+        font-size: 0.8em;
+      }
+
+      th, td {
+        padding: 6px;
+      }
+
+      h2 {
+        font-size: 1em;
+      }
+
+      button {
+        padding: 8px 16px;
+        font-size: 0.9em;
+      }
+    }
+
+    /* Adicionar barra de rolagem */
+    .container {
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    table {
+      min-width: 200px; /* Para tabelas maiores */
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="Log SJ png.png" alt="Logo da Empresa">
+    <h1>Controle de Ocupação de Quartos</h1>
+  </header>
+  <div class="container" id="tables-container"></div>
+  <div class="button-container">
+    <button onclick="resetData()">Resetar Dados</button>
+  </div>
+  <footer>
+    <p>&copy; 2025 Empresa de Alojamento - Todos os direitos reservados.</p>
+  </footer>
+
+  <script>
+    const accommodations = {
+      "Alojamento 1": { rooms: 20, beds: 4 },
+      "Alojamento 2": { rooms: 10, beds: 4 },
+      "Alojamento 3": { rooms: 6, beds: 4 },
+      "Suítes": { rooms: 12, beds: 2 }
+    };
+
+    const loadData = () => {
+      const savedData = localStorage.getItem("roomData");
+      return savedData ? JSON.parse(savedData) : {};
+    };
+
+    const saveData = (data) => {
+      localStorage.setItem("roomData", JSON.stringify(data));
+    };
+
+    let roomData = loadData();
+
+    const initializeData = () => {
+      Object.keys(accommodations).forEach((key) => {
+        if (!roomData[key]) {
+          roomData[key] = Array.from({ length: accommodations[key].rooms }, () =>
+            Array(accommodations[key].beds).fill("")
+          );
+        }
+      });
+      saveData(roomData);
+    };
+
+    const createTable = (name, rooms, beds) => {
+      const container = document.getElementById("tables-container");
+      const table = document.createElement("table");
+      const headerRow = document.createElement("tr");
+
+      headerRow.innerHTML = `<th>Quarto</th>`;
+      for (let i = 1; i <= beds; i++) {
+        headerRow.innerHTML += `<th>Cama ${i}</th>`;
+      }
+      headerRow.innerHTML += `<th>Status</th>`;
+      table.appendChild(headerRow);
+
+      roomData[name].forEach((room, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>Quarto ${index + 1}</td>`;
+
+        room.forEach((bed, bedIndex) => {
+          row.innerHTML += `<td><input type="text" value="${bed}" 
+                              onchange="updateData('${name}', ${index}, ${bedIndex}, this.value)" /></td>`;
+        });
+
+        const statusCell = document.createElement("td");
+        const availableBeds = room.filter((bed) => bed === "").length;
+        statusCell.className = "status";
+        statusCell.textContent =
+          availableBeds === 0 ? "Esgotado" : `${availableBeds} Disponível`;
+        statusCell.classList.add(availableBeds === 0 ? "esgotado" : "disponivel");
+        row.appendChild(statusCell);
+
+        table.appendChild(row);
+      });
+
+      const title = document.createElement("h2");
+      title.textContent = name;
+      container.appendChild(title);
+      container.appendChild(table);
+    };
+
+    const updateData = (name, roomIndex, bedIndex, value) => {
+      roomData[name][roomIndex][bedIndex] = value;
+      saveData(roomData);
+      renderTables();
+    };
+
+    const renderTables = () => {
+      const container = document.getElementById("tables-container");
+      container.innerHTML = ""; 
+      Object.keys(accommodations).forEach((key) => {
+        createTable(key, accommodations[key].rooms, accommodations[key].beds);
+      });
+    };
+
+    const resetData = () => {
+      if (confirm("Tem certeza de que deseja resetar todos os dados?")) {
+        localStorage.removeItem("roomData");
+        initializeData();
+        renderTables();
+      }
+    };
+
+    initializeData();
+    renderTables();
+  </script>
+</body>
+</html>
